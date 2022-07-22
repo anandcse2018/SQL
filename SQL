@@ -66,6 +66,8 @@ ALTER TABLE student   -- change column name, constraint, position
 CHANGE  COLUMN teacher master INT NOT NULL
 AFTER rating;
 
+TRUNCATE TABLE student; --deleted all data of table;
+
 SELECT * FROM student;  -- gives complete data
 INSERT INTO student VALUES(1, 'javi','CS');  -- insert data
 INSERT INTO student(student_id,name) VALUES(7, 'pushpa'); -- insert few data
@@ -313,6 +315,11 @@ CREATE
 DELIMITER ;
 INSERT INTO employee
 VALUES(111, 'Pam', 'Beesly', '1988-02-19', 'F', 69000, 106, 3);
+
+create trigger my_trigger before UPDATE ON student
+for each row begin
+INSERT INTO trigger_student values(NEW.sid,NEW.sname,NEW.salary);
+end
 
 DROP TRIGGER my_trigger;
 
