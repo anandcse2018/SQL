@@ -1,0 +1,320 @@
+--sudo mysql -u root           use for opening sql terminal
+CREATE DATABASE db_name;     --create database;
+SHOW DATABASES;              --show exiesting database
+SHOW TABLES;                 --show all table in selected database
+USE db_name;                 --select database
+DROP DATABASE db_name;       --deleted database;
+
+-- Data Types
+INT                           -- Whole Numbers
+DECIMAL(M,N)                  -- Decimal Numbers - Exact Value
+VARCHAR(l)                    -- String of text of length l
+BLOB                          -- Binary Large Object, Stores large data
+DATE                          -- 'YYYY-MM-DD'
+TIMESTAMP                     -- 'YYYY-MM-DD HH:MM:SS' - used for recording events
+
+CREATE TABLE student(        -- creating tables
+    student_id INT PRIMARY KEY,   -- PRIMARY KEY(student_id)
+    name VARCHAR(20),
+    major VARCHAR(20)
+    -- PRIMARY KEY(student_id)
+);
+
+-- creating table with constraint
+CREATE TABLE student(       
+    student_id INT PRIMARY KEY AUTO_INCREMENT,   -- PRIMARY KEY(student_id)
+    name VARCHAR(20) NOT NULL,
+    major VARCHAR(20) UNIQUE  -- DEFAULT 'undecided'
+);
+
+create table college(
+cid INT,
+cname VARCHAR(20),
+rating INT,
+PRIMARY KEY(cid),
+FOREIGN KEY(cid) REFERENCES student(sid) ON DELETE CASCADE);
+
+create table college(
+cid INT,
+cname VARCHAR(20),
+rating INT,
+PRIMARY KEY(cid),
+FOREIGN KEY(cid) REFERENCES student(sid) ON DELETE SET NULL);
+
+DESCRIBE student;    -- give table info
+DROP TABLE student;  -- delete table
+ALTER TABLE student ADD gpa DECIMAL(3, 2);  -- add column
+ALTER TABLE student DROP COLUMN gpa;   -- delete column
+
+ALTER TABLE employee RENAME TO worker; --change table name
+
+ALTER TABLE student  -- add new column after particular column
+ADD rating INT NOT NULL
+AFTER sex;
+
+ALTER TABLE student  -- add new column first
+ADD rating INT NOT NULL  -- default add in last
+FIRST;
+
+ALTER TABLE student  -- modify constraint NULL to NOT NULL
+MODIFY teacher INT NOT NULL
+
+ALTER TABLE student  -- change column name
+CHANGE COLUMN teacher master INT NULL;
+
+ALTER TABLE student   -- change column name, constraint, position
+CHANGE  COLUMN teacher master INT NOT NULL
+AFTER rating;
+
+SELECT * FROM student;  -- gives complete data
+INSERT INTO student VALUES(1, 'javi','CS');  -- insert data
+INSERT INTO student(student_id,name) VALUES(7, 'pushpa'); -- insert few data
+INSERT INTO student(name,major) VALUE('tavi', 'BT');
+
+UPDATE student    -- Update data
+SET name='savi'
+WHERE name='tavi' OR student_id=3;
+
+UPDATE student    -- Update data
+SET name='arti', major='undecided'
+WHERE student_id=4;
+
+UPDATE student    -- Update data
+SET name='anand';
+
+UPDATE student
+SET salary=salary+1000;
+
+DELETE FROM student
+WHERE student_id=3;
+
+SELECT name, major, student_id  -- getting information from table
+FROM student;
+
+SELECT name 
+FROM student;
+
+SELECT student.name, student.major
+FROM student;
+
+SELECT name 
+FROM student 
+ORDER BY name; -- sorted order by name
+
+SELECT name 
+FROM student 
+ORDER BY name DESC; -- sorted order reverse
+
+SELECT name 
+FROM student 
+ORDER BY student_id; -- sorted order by ID
+
+SELECT name 
+FROM student 
+ORDER BY student_id ASC; -- sorted order by ID
+
+SELECT name 
+FROM student 
+ORDER BY major, student_id;
+
+SELECT name 
+FROM student 
+ORDER BY major, student_id DESC;
+
+SELECT *
+FROM student
+LIMIT 2;
+
+SELECT * 
+FROM student 
+ORDER BY student_id DESC
+LIMIT 2;
+
+SELECT name, major
+FROM student
+WHERE MAJOR='cs';        -- < > <= >= = <> AND OR
+
+SELECT name, major
+FROM student
+WHERE MAJOR='IAS' OR student_id=2;
+
+SELECT *
+FROM student
+WHERE name IN ('ravi','kate','aman') AND student_id <> 1;
+
+SELECT first_name, last_name
+FROM employee;
+
+SELECT first_name AS FIRST, last_name AS SECOND
+FROM employee;
+
+SELECT DISTINCT sex
+FROM employee;
+
+SELECT COUNT(emp_id)
+FROM employee;
+
+SELECT COUNT(emp_id)
+FROM employee
+WHERE sex='F' AND birth_day > '1970-01-01';
+
+SSELECT AVG(salary)
+FROM employee
+WHERE sex='M';
+
+SELECT SUM(salary)
+FROM employee;
+
+SELECT COUNT(sex), sex
+FROM employee
+GROUP BY sex;
+
+SELECT SUM(total_sales), client_id
+FROM works_with
+GROUP BY client_id;
+
+SELECT *           --Wildcard
+FROM client
+WHERE client_name LIKE '%LLC';   --LIKE use for searching data
+                                 -- % means any number of character pass
+SELECT *
+FROM employee
+WHERE birth_day LIKE '%10%';
+
+SELECT *
+FROM employee
+WHERE birth_day LIKE '____-11%';  -- _ (underscore) means only one character pass
+
+SELECT first_name AS NAME  -- both SELECT contaion same number of row
+FROM employee
+UNION
+SELECT branch_name
+FROM branch;
+
+SELECT client_name,branch_id    -- confusion branch_id from where
+FROM client
+UNION
+SELECT supplier_name, branch_id
+FROM branch_supplier;
+
+SELECT client_name, client.branch_id    -- confusion branch_id from where
+FROM client
+UNION
+SELECT supplier_name, branch_supplier.branch_id
+FROM branch_supplier;
+
+SELECT first_name
+FROM employee JOIN branch
+WHERE mgr_id=emp_id;
+
+SELECT first_name
+FROM employee JOIN branch
+ON mgr_id=emp_id;
+
+SELECT emp_id,first_name,branch_name
+FROM employee 
+LEFT JOIN branch
+ON mgr_id=emp_id;
+
+SELECT emp_id,first_name,branch_name
+FROM employee 
+RIGHT JOIN branch
+ON mgr_id=emp_id;
+
+
+SELECT employee.first_name, employee.last_name  --Nested Query
+FROM employee
+WHERE employee.emp_id IN(
+    SELECT works_with.emp_id
+    FROM works_with
+    WHERE works_with.total_sales > 30000);
+
+SELECT client_name
+FROM client
+WHERE branch_id IN(
+    SELECT branch_id
+    FROM branch
+    WHERE mgr_id=102);
+
+SELECT client.client_name
+FROM client
+WHERE client.branch_id =(
+    SELECT branch.branch_id
+    FROM branch
+    WHERE branch.mgr_id=102);
+
+DELETE FROM employee
+WHERE emp_id=102;
+
+SELECT                     -- finding foreign key, refrencing table
+    TABLE_NAME,
+    COLUMN_NAME,
+    CONSTRAINT_NAME,
+    REFERENCED_TABLE_NAME,
+    REFERENCED_COLUMN_NAME
+FROM
+    INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+WHERE
+    REFERENCED_TABLE_SCHEMA = 'anand'
+    AND REFERENCED_TABLE_NAME = 'branch';
+
+
+-- CREATE
+--     TRIGGER `event_name` BEFORE/AFTER INSERT/UPDATE/DELETE
+--     ON `database`.`table`
+--     FOR EACH ROW BEGIN
+--      -- trigger body
+--      -- this code is applied to every
+--      -- inserted/updated/deleted row
+--     END;
+
+CREATE TABLE trigger_test (
+     message VARCHAR(100)
+);
+
+SHOW TRIGGERS;
+
+DELIMITER $$  -- change delimiter
+CREATE
+    TRIGGER my_trigger BEFORE INSERT
+    ON student
+    FOR EACH ROW BEGIN
+       INSERT INTO trigger_test VALUES('added new student');
+    END$$
+DELIMITER ;
+INSERT INTO employee
+VALUES(109, 'Oscar', 'Martinez', '1968-02-19', 'M', 69000, 106, 3);
+
+
+DELIMITER $$
+CREATE
+    TRIGGER my_trigger BEFORE INSERT
+    ON student
+    FOR EACH ROW BEGIN
+        INSERT INTO trigger_test VALUES(NEW.sname);
+    END$$
+DELIMITER ;
+INSERT INTO employee
+VALUES(110, 'Kevin', 'Malone', '1978-02-19', 'M', 69000, 106, 3);
+
+DELIMITER $$
+CREATE
+    TRIGGER my_trigger BEFORE INSERT
+    ON employee
+    FOR EACH ROW BEGIN
+         IF NEW.sex = 'M' THEN
+               INSERT INTO trigger_test VALUES('added male employee');
+         ELSEIF NEW.sex = 'F' THEN
+               INSERT INTO trigger_test VALUES('added female');
+         ELSE
+               INSERT INTO trigger_test VALUES('added other employee');
+         END IF;
+    END$$
+DELIMITER ;
+INSERT INTO employee
+VALUES(111, 'Pam', 'Beesly', '1988-02-19', 'F', 69000, 106, 3);
+
+DROP TRIGGER my_trigger;
+
+
+SELECT 'Anand Maurya' AS ' ';  -- uesd for print
